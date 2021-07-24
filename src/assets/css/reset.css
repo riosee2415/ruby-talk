@@ -137,3 +137,7 @@ a {
   color: #333;
   font-weight: bold;
 }
+
+html {
+  font-family: "Bebas Neue", cursive;
+}
