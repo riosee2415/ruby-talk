@@ -62,7 +62,7 @@ export const loginController = async (req, res) => {
 
     Promise.all(
       result.map((user) => {
-        if (user.userId === input_id && user.userPassword == input_pass) {
+        if (user.userId === input_id && user.userPassword === input_pass) {
           loginFlag = true;
           sess.userId = user._id;
         }
