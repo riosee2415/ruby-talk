@@ -1,4 +1,6 @@
 import User from "../models/User";
+import Message from "../models/Message";
+import mongoose from "mongoose";
 
 export const testScreen = (req, res) => {
   res.render("base");
@@ -74,5 +76,39 @@ export const loginController = async (req, res) => {
   } catch (e) {
     console.log("[SYSTEM] 사용자가 로그인을 시도하였지만 에러가 발생했습니다.");
     mainController(req, res);
+  }
+};
+
+export const sendMessageController = async (req, res) => {
+  const sess = req.session;
+
+  const {
+    body: { reveiveId, msg },
+  } = req;
+
+  const sendUser = sess.userId;
+
+  try {
+    const obid_sendUser = mongoose.Types.ObjectId(sendUser);
+    const obid_receiveUser = mongoose.Types.ObjectId(reveiveId);
+
+    const msgResult = await Message.create({
+      sendUser: obid_sendUser,
+      receiveUser: obid_receiveUser,
+      content: msg,
+    });
+
+    const sendUserObj = await User.findOne({ _id: sendUser });
+    sendUserObj.sMsgList.push(msgResult._id);
+    sendUserObj.save();
+
+    const receiveUserObj = await User.findOne({ _id: reveiveId });
+    receiveUserObj.rMsgList.push(msgResult._id);
+    receiveUserObj.save();
+
+    friendsController(req, res);
+  } catch (error) {
+    console.log(error);
+    throw Error("메세지 전송에 실패했습니다.");
   }
 };
